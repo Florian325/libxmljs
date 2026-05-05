@@ -62,25 +62,24 @@ jobs:
               with:
                   persist-credentials: false
                   submodules: true
-            - name: Force Python 3.10 (newer versions do not work with node-gyp version bundled with node v12)
-              uses: actions/setup-python@v2
-              with:
-                  python-version: "3.10"
             - name: Point node-gyp at Python
               run: |
-                  echo "PYTHON=${pythonLocation}/bin/python3" >> "$GITHUB_ENV"
-                  echo "npm_config_python=${pythonLocation}/bin/python3" >> "$GITHUB_ENV"
+                  echo "PYTHON=/opt/python/cp310-cp310/bin/python3" >> "$GITHUB_ENV"
+                  echo "npm_config_python=/opt/python/cp310-cp310/bin/python3" >> "$GITHUB_ENV"
+                  echo "pythonLocation=/opt/python/cp310-cp310" >> "$GITHUB_ENV"
+                  
             - run: |
                   which python3 || true
-                  python3 --version || true
+                  /opt/python/cp310-cp310/bin/python3 --version || true
                   echo "pythonLocation=$pythonLocation"
                   ls -la "$pythonLocation/bin" | head
+                  
             - name: Use Node.js ${{ matrix.config.node-version }}
               uses: actions/setup-node@v3
               with:
                   node-version: ${{ matrix.config.node-version }}
                   cache: "npm"
-            - run: yum install -y gcc-c++
+            - run: yum install -y gcc-c++ make
             - run: ldd --version
             - run: npm ci --build-from-source
             - run: npm run package 2>&1
