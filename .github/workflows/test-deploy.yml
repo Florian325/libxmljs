@@ -79,8 +79,13 @@ jobs:
               with:
                   node-version: ${{ matrix.config.node-version }}
                   cache: "npm"
-            - run: yum install -y gcc-c++ make
-            - run: ldd --version
+            - name: Install and configure newer GCC
+              run: |
+                  yum install -y gcc-toolset-12-gcc-c++ make
+                  echo "CC=/opt/rh/gcc-toolset-12/root/usr/bin/gcc" >> "$GITHUB_ENV"
+                  echo "CXX=/opt/rh/gcc-toolset-12/root/usr/bin/g++" >> "$GITHUB_ENV"
+                  
+            - run: $CXX --version
             - run: npm ci --build-from-source
             - run: npm run package 2>&1
             - run: npm run tsc
